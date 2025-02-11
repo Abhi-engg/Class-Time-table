@@ -1,2 +1,91 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Calendar Custom Styles */
+.rbc-calendar {
+  @apply font-sans;
+}
+
+.rbc-toolbar {
+  @apply flex flex-wrap justify-between items-center mb-4 gap-2;
+}
+
+.rbc-toolbar-label {
+  @apply text-lg font-semibold text-gray-800;
+}
+
+.rbc-header {
+  @apply bg-blue-600 text-white py-2 font-semibold;
+}
+
+.rbc-time-header-content {
+  @apply border-blue-300;
+}
+
+.rbc-time-slot {
+  @apply text-sm text-gray-600;
+}
+
+.rbc-event {
+  @apply bg-blue-500 border-none rounded shadow-sm;
+}
+
+.rbc-event-content {
+  @apply text-sm font-medium;
+}
+
+.rbc-time-view {
+  @apply rounded-lg border-gray-200;
+}
+
+.rbc-timeslot-group {
+  @apply border-gray-200;
+}
+
+.rbc-time-content {
+  @apply border-gray-200;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 640px) {
+  .rbc-toolbar {
+    @apply flex-col items-stretch;
+  }
+  
+  .rbc-toolbar-label {
+    @apply text-center my-2;
+  }
+  
+  .rbc-btn-group {
+    @apply flex justify-center gap-2;
+  }
+  
+  .rbc-time-view {
+    @apply text-sm;
+  }
+  
+  .rbc-time-header-content {
+    @apply text-xs;
+  }
+}
+
+/* Custom Time Gutter Width */
+.rbc-time-gutter {
+  @apply w-20;
+}
+
+/* Event Styles */
+.rbc-event {
+  @apply bg-gradient-to-r from-blue-500 to-blue-600;
+}
+
+.rbc-event:hover {
+  @apply from-blue-600 to-blue-700;
+}
+
+.rbc-today {
+  @apply bg-blue-50;
+}
 

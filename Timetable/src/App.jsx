@@ -1,11 +1,12 @@
 import React from 'react'
 import Timetable from './components/Timetable'
-import './App.css'
 
 function App() {
   return (
-    <div className="app">
-      <Timetable />
+    <div className="min-h-screen bg-gray-100">
+      <div className="w-full min-h-screen">
+        <Timetable />
+      </div>
     </div>
   )
 }
