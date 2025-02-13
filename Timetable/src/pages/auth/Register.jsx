@@ -22,18 +22,27 @@ const Register = () => {
   });
 
   const departmentOptions = [
-    { value: 'cs', label: 'Computer Science' },
-    { value: 'it', label: 'Information Technology' },
-    { value: 'ec', label: 'Electronics' },
-    { value: 'ee', label: 'Electrical' }
+    { value: 'Comps', label: 'Computer Engineering' },
+    { value: 'IT', label: 'Information Technology' },
+    { value: 'AIML', label: 'AIML' },
+    { value: 'Data', label: 'Data Engineering' },
+    { value: 'civil', label: 'Civil'}
   ];
 
   const yearOptions = [
-    { value: '1', label: 'First Year' },
-    { value: '2', label: 'Second Year' },
-    { value: '3', label: 'Third Year' },
-    { value: '4', label: 'Fourth Year' }
+    { value: 'FE', label: 'First Year' },
+    { value: 'SE', label: 'Second Year' },
+    { value: 'TE', label: 'Third Year' },
+    { value: 'BE', label: 'Fourth Year' }
   ];
+ 
+  const classOption = [
+    { value: 'FE', label: 'First Year' },
+    { value: 'SE', label: 'Second Year' },
+    { value: 'TE', label: 'Third Year' },
+    { value: 'BE', label: 'Fourth Year' }
+  ];
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,11 +97,7 @@ const Register = () => {
             placeholder="Select Year"
           />
 
-          <Input
-            label="Class"
-            value={formData.className}
-            onChange={(e) => setFormData(prev => ({ ...prev, className: e.target.value }))}
-            placeholder="Enter your class"
+          <Select
           />
 
           <Input
