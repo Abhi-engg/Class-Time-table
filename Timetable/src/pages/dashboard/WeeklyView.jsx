@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 
 const WeeklyView = () => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -12,7 +12,6 @@ const WeeklyView = () => {
     '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'
   ];
 
-  // Sample weekly schedule data
   const weeklySchedule = {
     Monday: [
       { time: '9:00 AM', subject: 'Mathematics', teacher: 'Dr. Smith', room: '101' },
@@ -22,7 +21,6 @@ const WeeklyView = () => {
       { time: '10:00 AM', subject: 'Chemistry', teacher: 'Dr. Davis', room: '103' },
       { time: '2:00 PM', subject: 'Biology', teacher: 'Mrs. Wilson', room: '104' },
     ],
-    // Add more days...
   };
 
   const getClassForTimeSlot = (day, time) => {
@@ -36,11 +34,10 @@ const WeeklyView = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Weekly Schedule
           </h2>
           <div className="flex items-center space-x-4">
@@ -65,78 +62,73 @@ const WeeklyView = () => {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Department</p>
-            <p className="font-medium text-gray-900 dark:text-white">{user?.department}</p>
+
+        <div className="grid grid-cols-6 gap-4">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+            <p className="text-sm text-gray-500 dark:text-gray-300">Department</p>
+            <p className="font-medium text-gray-900 dark:text-white">{currentUser?.department}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Year</p>
-            <p className="font-medium text-gray-900 dark:text-white">{user?.year}</p>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+            <p className="text-sm text-gray-500 dark:text-gray-300">Year</p>
+            <p className="font-medium text-gray-900 dark:text-white">{currentUser?.year}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Class</p>
-            <p className="font-medium text-gray-900 dark:text-white">{user?.className}</p>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+            <p className="text-sm text-gray-500 dark:text-gray-300">Class</p>
+            <p className="font-medium text-gray-900 dark:text-white">{currentUser?.className}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Roll Number</p>
-            <p className="font-medium text-gray-900 dark:text-white">{user?.rollNumber}</p>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+            <p className="text-sm text-gray-500 dark:text-gray-300">Roll Number</p>
+            <p className="font-medium text-gray-900 dark:text-white">{currentUser?.rollNumber}</p>
           </div>
         </div>
-      </div>
 
-      {/* Timetable Grid */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-        <div className="grid grid-cols-6 border-b border-gray-200 dark:border-gray-700">
-          {/* Time column header */}
-          <div className="p-4 font-medium text-gray-500 dark:text-gray-400 text-sm">
-            Time
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg shadow-sm overflow-hidden">
+          <div className="grid grid-cols-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-4 font-medium text-gray-500 dark:text-gray-400 text-sm">
+              Time
+            </div>
+            {days.map((day) => (
+              <div key={day} className="p-4 font-medium text-gray-900 dark:text-white text-sm">
+                {day}
+              </div>
+            ))}
           </div>
-          {/* Day column headers */}
-          {days.map((day) => (
-            <div key={day} className="p-4 font-medium text-gray-900 dark:text-white text-sm">
-              {day}
+
+          {timeSlots.map((time) => (
+            <div key={time} className="grid grid-cols-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="p-4 text-sm text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700">
+                {time}
+              </div>
+              {days.map((day) => {
+                const classInfo = getClassForTimeSlot(day, time);
+                return (
+                  <motion.div
+                    key={`${day}-${time}`}
+                    whileHover={{ scale: 1.02 }}
+                    className={`p-4 ${classInfo ? 'bg-gray-50 dark:bg-gray-800' : ''}`}
+                  >
+                    {classInfo && (
+                      <div className="space-y-1">
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {classInfo.subject}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {classInfo.teacher}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Room {classInfo.room}
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           ))}
         </div>
-
-        {/* Time slots */}
-        {timeSlots.map((time) => (
-          <div key={time} className="grid grid-cols-6 border-b border-gray-200 dark:border-gray-700">
-            {/* Time column */}
-            <div className="p-4 text-sm text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700">
-              {time}
-            </div>
-            {/* Day columns */}
-            {days.map((day) => {
-              const classInfo = getClassForTimeSlot(day, time);
-              return (
-                <motion.div
-                  key={`${day}-${time}`}
-                  whileHover={{ scale: 1.02 }}
-                  className={`p-4 ${classInfo ? 'bg-indigo-50 dark:bg-indigo-900/30' : ''}`}
-                >
-                  {classInfo && (
-                    <div className="space-y-1">
-                      <p className="font-medium text-indigo-600 dark:text-indigo-400">
-                        {classInfo.subject}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {classInfo.teacher}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Room {classInfo.room}
-                      </p>
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        ))}
       </div>
     </div>
   );
 };
 
-export default WeeklyView; 
+export default WeeklyView;

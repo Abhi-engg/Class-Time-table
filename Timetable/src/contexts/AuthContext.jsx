@@ -1,6 +1,87 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setCurrentUser(JSON.parse(user));
+    }
+    setLoading(false);
+  }, []);
+
+  const register = async (userData) => {
+    try {
+      console.log('Registering user:', userData);
+      const { confirmPassword, ...userDetails } = userData;
+      
+      const newUser = {
+        id: 'user_' + Math.random().toString(36).substr(2, 9),
+        displayName: `${userData.firstName} ${userData.lastName}`,
+        ...userDetails,
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('user', JSON.stringify(newUser));
+      localStorage.setItem('token', 'mock_token_' + Math.random().toString(36).substr(2, 9));
+      
+      setCurrentUser(newUser);
+      console.log('User registered successfully:', newUser);
+
+      return newUser;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw new Error('Registration failed. Please try again.');
+    }
+  };
+
+  const login = async (email, password) => {
+    try {
+      console.log('Attempting login with email:', email);
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        throw new Error('User not found');
+      }
+
+      const user = JSON.parse(storedUser);
+      if (user.email === email && user.password === password) {
+        setCurrentUser(user);
+        console.log('Login successful:', user);
+        return user;
+      } else {
+        throw new Error('Invalid email or password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw new Error('Login failed');
+    }
+  };
+
+  const logout = () => {
+    console.log('Logging out user:', currentUser);
+    setCurrentUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
+
+  const value = {
+    currentUser,
+    register,
+    login,
+    logout,
+    loading
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -10,66 +91,4 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
-  const login = useCallback(async ({ email, password }) => {
-    try {
-      // Here you would typically make an API call to your backend
-      // For demo purposes, we'll simulate a successful login
-      const userData = {
-        id: '1',
-        email,
-        department: 'Computer Science',
-        year: '3rd Year',
-        className: 'CS-A',
-        rollNumber: 'CS2021001'
-      };
-
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-    } catch (error) {
-      throw new Error('Invalid credentials');
-    }
-  }, []);
-
-  const register = useCallback(async (userData) => {
-    try {
-      // Here you would typically make an API call to your backend
-      // For demo purposes, we'll simulate a successful registration
-      const newUser = {
-        id: Date.now().toString(),
-        ...userData
-      };
-
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-    } catch (error) {
-      throw new Error('Registration failed');
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    setUser(null);
-    localStorage.removeItem('user');
-  }, []);
-
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    isAuthenticated: !!user
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export default AuthContext; 
+export default AuthProvider;

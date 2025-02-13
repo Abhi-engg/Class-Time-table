@@ -16,9 +16,9 @@ import Settings from './pages/dashboard/Settings';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { currentUser } = useAuth();
   
-  if (!isAuthenticated) {
+  if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 
