@@ -16,56 +16,114 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      console.log('Registering user:', userData);
       const { confirmPassword, ...userDetails } = userData;
       
+      // Create a comprehensive user object
       const newUser = {
         id: 'user_' + Math.random().toString(36).substr(2, 9),
-        displayName: `${userData.firstName} ${userData.lastName}`,
-        ...userDetails,
-        createdAt: new Date().toISOString()
+        name: `${userData.firstName} ${userData.lastName}`,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        department: userData.department,
+        year: userData.year,
+        className: userData.className,
+        rollNumber: userData.rollNumber,
+        
+        // Academic Details
+        semester: getSemesterFromYear(userData.year),
+        attendance: Math.floor(Math.random() * 20) + 80, // 80-100%
+        completedAssignments: Math.floor(Math.random() * 15),
+        upcomingEvents: Math.floor(Math.random() * 5),
+        cgpa: (Math.random() * 2 + 8).toFixed(2), // 8.00-10.00
+        
+        // Course Information
+        currentSubjects: getSubjectsForDepartment(userData.department),
+        facultyAdvisor: getFacultyAdvisor(userData.department),
+        
+        // System Info
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        accountStatus: 'active',
+        
+        ...userDetails
       };
 
       localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('token', 'mock_token_' + Math.random().toString(36).substr(2, 9));
-      
       setCurrentUser(newUser);
-      console.log('User registered successfully:', newUser);
-
       return newUser;
     } catch (error) {
       console.error('Registration error:', error);
-      throw new Error('Registration failed. Please try again.');
+      throw error;
     }
   };
 
   const login = async (email, password) => {
     try {
-      console.log('Attempting login with email:', email);
       const storedUser = localStorage.getItem('user');
-      if (!storedUser) {
-        throw new Error('User not found');
-      }
+      if (!storedUser) throw new Error('User not found');
 
       const user = JSON.parse(storedUser);
       if (user.email === email && user.password === password) {
-        setCurrentUser(user);
-        console.log('Login successful:', user);
-        return user;
-      } else {
-        throw new Error('Invalid email or password');
+        const updatedUser = {
+          ...user,
+          lastLogin: new Date().toISOString()
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setCurrentUser(updatedUser);
+        return updatedUser;
       }
+      throw new Error('Invalid credentials');
     } catch (error) {
       console.error('Login error:', error);
-      throw new Error('Login failed');
+      throw error;
     }
   };
 
   const logout = () => {
-    console.log('Logging out user:', currentUser);
     setCurrentUser(null);
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
+  };
+
+  // Helper Functions
+  const getSemesterFromYear = (year) => {
+    const semesterMap = {
+      'FE': '1st & 2nd',
+      'SE': '3rd & 4th',
+      'TE': '5th & 6th',
+      'BE': '7th & 8th'
+    };
+    return semesterMap[year] || '1st';
+  };
+
+  const getSubjectsForDepartment = (dept) => {
+    const subjects = {
+      'Comps': [
+        { name: 'Data Structures', faculty: 'Dr. Smith', code: 'CS101' },
+        { name: 'Database Systems', faculty: 'Prof. Johnson', code: 'CS102' },
+        { name: 'Computer Networks', faculty: 'Dr. Williams', code: 'CS103' }
+      ],
+      'IT': [
+        { name: 'Web Development', faculty: 'Prof. Davis', code: 'IT101' },
+        { name: 'Cloud Computing', faculty: 'Dr. Miller', code: 'IT102' },
+        { name: 'Information Security', faculty: 'Prof. Wilson', code: 'IT103' }
+      ],
+      'AIML': [
+        { name: 'Machine Learning', faculty: 'Dr. Brown', code: 'AI101' },
+        { name: 'Neural Networks', faculty: 'Prof. Taylor', code: 'AI102' },
+        { name: 'Data Mining', faculty: 'Dr. Anderson', code: 'AI103' }
+      ]
+    };
+    return subjects[dept] || [];
+  };
+
+  const getFacultyAdvisor = (dept) => {
+    const advisors = {
+      'Comps': 'Dr. Robert Smith',
+      'IT': 'Prof. Sarah Johnson',
+      'AIML': 'Dr. Michael Brown'
+    };
+    return advisors[dept] || 'To be assigned';
   };
 
   const value = {

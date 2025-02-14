@@ -124,6 +124,14 @@ const Settings = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Name
+                </h3>
+                <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  {currentUser?.name}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   Department
                 </h3>
                 <p className="mt-1 text-sm text-gray-900 dark:text-white">

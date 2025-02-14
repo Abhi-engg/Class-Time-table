@@ -79,8 +79,16 @@ const WeeklyView = () => {
         {/* User Info Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
           <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">Name</p>
+            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
+              {currentUser?.name}
+            </p>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">Department</p>
-            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{currentUser?.department}</p>
+            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
+              {currentUser?.department}
+            </p>
           </div>
           <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">Year</p>

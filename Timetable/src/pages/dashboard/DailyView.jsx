@@ -21,7 +21,7 @@ const DailyView = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome, {currentUser?.displayName || 'User'}!
+              Welcome, {currentUser?.name || 'Guest'}!
             </h1>
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {new Date().toLocaleDateString('en-US', {
