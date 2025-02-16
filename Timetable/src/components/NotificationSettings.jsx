@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const NotificationSettings = ({ isOpen, onClose, onSave }) => {
   const [settings, setSettings] = useState({
@@ -135,6 +136,12 @@ const NotificationSettings = ({ isOpen, onClose, onSave }) => {
       </div>
     </div>
   );
+};
+
+NotificationSettings.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired
 };
 
 export default NotificationSettings; 

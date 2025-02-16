@@ -1,4 +1,5 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
+import PropTypes from 'prop-types';
 
 const Input = forwardRef(({
   label,
@@ -61,6 +62,16 @@ const Input = forwardRef(({
     </div>
   );
 });
+
+Input.propTypes = {
+  label: PropTypes.string,
+  error: PropTypes.string,
+  className: PropTypes.string,
+  type: PropTypes.string,
+  helperText: PropTypes.string,
+  leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
+};
 
 Input.displayName = 'Input';
 

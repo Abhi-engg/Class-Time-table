@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion, } from 'framer-motion';
+import PropTypes from 'prop-types';
 
 const Calendar = ({ events = [], onSelectDate, selectedDate = new Date() }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -141,6 +142,17 @@ const Calendar = ({ events = [], onSelectDate, selectedDate = new Date() }) => {
       </div>
     </div>
   );
+};
+
+Calendar.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+      title: PropTypes.string
+    })
+  ),
+  onSelectDate: PropTypes.func.isRequired,
+  selectedDate: PropTypes.instanceOf(Date)
 };
 
 export default Calendar; 

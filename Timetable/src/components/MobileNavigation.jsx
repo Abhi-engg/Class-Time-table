@@ -1,9 +1,6 @@
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const MobileNavigation = () => {
-  const location = useLocation();
-
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 md:hidden">
       <div className="grid grid-cols-4 h-16">

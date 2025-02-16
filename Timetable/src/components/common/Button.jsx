@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import PropTypes from 'prop-types';
 
 const variants = {
   primary: 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-indigo-500/25',
@@ -21,31 +22,95 @@ const sizes = {
 
 const animations = {
   bounce: {
-    hover: { scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 10 } },
-    tap: { scale: 0.95 }
+    initial: { scale: 1 },
+    hover: { 
+      scale: 1.05,
+      transition: { 
+        type: "spring",
+        stiffness: 400,
+        damping: 17
+      }
+    },
+    tap: { 
+      scale: 0.95,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10
+      }
+    }
   },
   slide: {
-    hover: { x: [0, -4, 4, 0], transition: { duration: 0.4 } },
-    tap: { scale: 0.98 }
+    initial: { x: 0 },
+    hover: { 
+      x: 5,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10
+      }
+    },
+    tap: { x: -2 }
   },
   pulse: {
+    initial: { scale: 1 },
     hover: { 
-      scale: [1, 1.05, 1],
+      scale: [1, 1.04, 1],
       transition: { 
-        duration: 0.4,
+        duration: 0.8,
         repeat: Infinity,
-        repeatType: "reverse"
+        ease: "easeInOut"
       }
     },
     tap: { scale: 0.95 }
   },
   glow: {
+    initial: { 
+      boxShadow: "0 0 0px rgba(99,102,241,0)",
+      scale: 1
+    },
     hover: { 
       boxShadow: "0 0 20px rgba(99,102,241,0.5)",
-      transition: { duration: 0.3 }
+      scale: 1.02,
+      transition: { 
+        duration: 0.2,
+        ease: "easeInOut"
+      }
     },
     tap: { scale: 0.98 }
+  },
+  float: {
+    initial: { y: 0 },
+    hover: {
+      y: -5,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 25
+      }
+    },
+    tap: { y: 2 }
+  },
+  shine: {
+    initial: { 
+      background: "linear-gradient(45deg, transparent 0%, transparent 100%)",
+      backgroundSize: "200% 200%",
+      backgroundPosition: "0% 0%"
+    },
+    hover: {
+      backgroundPosition: "100% 100%",
+      transition: { duration: 0.8, ease: "easeInOut" }
+    }
   }
+};
+
+const getButtonClasses = (variant, size, disabled) => {
+  const baseClasses = 'rounded-lg shadow-lg focus:outline-none';
+  const variantClasses = variants[variant];
+  const sizeClasses = sizes[size];
+  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
+  
+  return `${baseClasses} ${variantClasses} ${sizeClasses} ${disabledClasses}`;
 };
 
 const Button = ({
@@ -59,6 +124,7 @@ const Button = ({
   rightIcon,
   animation = 'bounce',
   ripple = true,
+  error,
   ...props
 }) => {
   const [rippleEffect, setRippleEffect] = React.useState([]);
@@ -82,68 +148,142 @@ const Button = ({
     setRippleEffect(rippleEffect.filter(ripple => ripple.id !== id));
   };
 
-  return (
-    <motion.button
-      whileHover={animations[animation].hover}
-      whileTap={animations[animation].tap}
-      disabled={disabled || isLoading}
-      onClick={handleRipple}
-      className={`
-        relative overflow-hidden
-        inline-flex items-center justify-center rounded-lg font-medium
-        transition-all duration-200 ease-in-out
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-        disabled:opacity-60 disabled:cursor-not-allowed
-        shadow-md hover:shadow-lg
-        ${variants[variant]}
-        ${sizes[size]}
-        ${className}
-      `}
-      {...props}
-    >
-      {/* Ripple Effects */}
-      {rippleEffect.map(ripple => (
-        <motion.span
-          key={ripple.id}
-          initial={{ scale: 0, opacity: 0.5 }}
-          animate={{ scale: 1, opacity: 0 }}
-          transition={{ duration: 0.7 }}
-          onAnimationComplete={() => removeRipple(ripple.id)}
-          style={{
-            position: 'absolute',
-            left: ripple.x,
-            top: ripple.y,
-            width: ripple.size,
-            height: ripple.size,
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.3)',
-            transform: 'translate(-50%, -50%)'
-          }}
-        />
-      ))}
+  // Enhanced error animation with smoother transitions
+  const errorAnimation = {
+    initial: { 
+      x: 0,
+      borderColor: 'transparent'
+    },
+    animate: error ? {
+      x: [0, -4, 4, -4, 4, 0],
+      borderColor: ['transparent', '#EF4444', '#EF4444', '#EF4444', '#EF4444', '#EF4444'],
+      transition: {
+        duration: 0.6,
+        ease: [0.36, 0, 0.66, -0.56],
+        borderColor: { duration: 0.1 }
+      }
+    } : {
+      x: 0,
+      borderColor: 'transparent',
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
 
-      {/* Loading Spinner */}
-      {isLoading ? (
+  return (
+    <div className="relative">
+      <motion.button
+        disabled={disabled || isLoading}
+        onClick={handleRipple}
+        className={`
+          relative overflow-hidden
+          inline-flex items-center justify-center
+          transition-all duration-200
+          ${getButtonClasses(variant, size, disabled)}
+          ${error ? 'border-2 border-red-500 dark:border-red-400' : ''}
+          ${className}
+        `}
+        initial="initial"
+        animate="animate"
+        whileHover={!disabled && !isLoading ? "hover" : undefined}
+        whileTap={!disabled && !isLoading ? "tap" : undefined}
+        variants={{
+          ...animations[animation],
+          ...errorAnimation
+        }}
+        {...props}
+      >
+        {/* Ripple effect */}
+        {rippleEffect.map(ripple => (
+          <motion.span
+            key={ripple.id}
+            className="absolute bg-white/30 rounded-full"
+            style={{
+              left: ripple.x,
+              top: ripple.y,
+              width: ripple.size,
+              height: ripple.size,
+            }}
+            initial={{ scale: 0, opacity: 0.35 }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            onAnimationComplete={() => removeRipple(ripple.id)}
+          />
+        ))}
+
+        {/* Button content */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex items-center"
+          animate={{ opacity: isLoading ? 0 : 1 }}
+          className="flex items-center gap-2"
         >
-          <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          Loading...
-        </motion.div>
-      ) : (
-        <motion.div className="flex items-center">
-          {leftIcon && <span className="mr-2">{leftIcon}</span>}
+          {leftIcon && <span className="inline-flex">{leftIcon}</span>}
           {children}
-          {rightIcon && <span className="ml-2">{rightIcon}</span>}
+          {rightIcon && <span className="inline-flex">{rightIcon}</span>}
         </motion.div>
-      )}
-    </motion.button>
+
+        {/* Loading spinner */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center bg-inherit"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+      {/* Enhanced error message with better animation */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            className="absolute left-0 right-0 text-center"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 4 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="text-sm text-red-500 dark:text-red-400">
+              {error}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
+};
+
+Button.propTypes = {
+  children: PropTypes.node,
+  variant: PropTypes.oneOf(['primary', 'secondary', 'danger', 'success', 'outline', 'glass', 'neon']),
+  size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
+  className: PropTypes.string,
+  isLoading: PropTypes.bool,
+  disabled: PropTypes.bool,
+  leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
+  animation: PropTypes.oneOf(['bounce', 'slide', 'pulse', 'glow', 'float', 'shine']),
+  ripple: PropTypes.bool,
+  error: PropTypes.string,
+  onClick: PropTypes.func,
+};
+
+Button.defaultProps = {
+  variant: 'primary',
+  size: 'md',
+  className: '',
+  isLoading: false,
+  disabled: false,
+  animation: 'bounce',
+  ripple: true,
 };
 
 export default Button;

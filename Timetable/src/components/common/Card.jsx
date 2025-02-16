@@ -1,5 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import PropTypes from 'prop-types';
 
 const Card = ({
   children,
@@ -51,5 +51,32 @@ Card.Footer = ({ children, className = '' }) => (
     {children}
   </div>
 );
+
+Card.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  hover: PropTypes.bool,
+  onClick: PropTypes.func,
+};
+
+Card.Header.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+Card.Body.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+Card.Footer.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+// Give display names to subcomponents
+Card.Header.displayName = 'Card.Header';
+Card.Body.displayName = 'Card.Body';
+Card.Footer.displayName = 'Card.Footer';
 
 export default Card; 

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import PropTypes from 'prop-types';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -160,6 +161,16 @@ const Login = () => {
         </div>
       </div>
     );
+  };
+
+  CustomSelect.propTypes = {
+    label: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    options: PropTypes.arrayOf(PropTypes.string).isRequired,
+    value: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
+    placeholder: PropTypes.string
   };
 
   // Add this CSS to your global styles or component

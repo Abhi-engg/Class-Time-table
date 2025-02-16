@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -71,7 +71,7 @@ const Register = () => {
     const surname = lastName ? lastName.toLowerCase() : '';
     const year = new Date().getFullYear().toString().slice(-2);
     
-    return `${name}.${surname}@universal.edu`;
+    return `${name}.${surname}@universal.edu.in`;
   };
 
   const handleSubmit = async (e) => {
