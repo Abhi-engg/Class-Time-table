@@ -25,6 +25,9 @@ const Register = () => {
     confirmPassword: ''
   });
 
+  // Add validation state
+  const [validationErrors, setValidationErrors] = useState({});
+  
   // Smart defaults based on common patterns
   const departmentOptions = [
     { value: 'Comps', label: 'Computer Engineering' },
@@ -74,8 +77,65 @@ const Register = () => {
     return `${name}.${surname}@universal.edu.in`;
   };
 
+  // Validation rules
+  const validateStep = (stepNumber) => {
+    const errors = {};
+    
+    switch(stepNumber) {
+      case 1:
+        if (!formData.firstName.trim()) 
+          errors.firstName = 'First name is required';
+        if (!formData.lastName.trim()) 
+          errors.lastName = 'Last name is required';
+        if (!formData.department) 
+          errors.department = 'Department is required';
+        if (!formData.year) 
+          errors.year = 'Year is required';
+        break;
+        
+      case 2:
+        if (!formData.className) 
+          errors.className = 'Class is required';
+        if (!formData.rollNumber) 
+          errors.rollNumber = 'Roll number is required';
+        if (!formData.email) 
+          errors.email = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+          errors.email = 'Invalid email format';
+        break;
+        
+      case 3:
+        if (!formData.password) 
+          errors.password = 'Password is required';
+        else if (formData.password.length < 8)
+          errors.password = 'Password must be at least 8 characters';
+        else if (!/(?=.*[0-9])(?=.*[!@#$%^&*])/.test(formData.password))
+          errors.password = 'Password must include numbers and symbols';
+        if (!formData.confirmPassword) 
+          errors.confirmPassword = 'Please confirm your password';
+        else if (formData.password !== formData.confirmPassword)
+          errors.confirmPassword = 'Passwords do not match';
+        break;
+        
+      default:
+        break;
+    }
+    
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate current step
+    const errors = validateStep(step);
+    setValidationErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      // Show error animation or notification
+      return;
+    }
+
     if (step < 3) {
       setStep(step + 1);
       return;
@@ -85,14 +145,44 @@ const Register = () => {
     setLoading(true);
 
     try {
-      if (formData.password !== formData.confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
+      // 1. Primary Storage: Database (through register function)
+      const userData = {
+        ...formData,
+        email: formData.email.toLowerCase(),
+        rollNumber: formData.rollNumber.toUpperCase(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'active',
+        role: 'student',
+        academicDetails: {
+          department: formData.department,
+          year: formData.year,
+          className: formData.className,
+          rollNumber: formData.rollNumber
+        },
+        personalDetails: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          fullName: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email
+        }
+      };
 
-      await register(formData);
+      // This sends data to your backend database
+      await register(userData);
+      
+      // 2. Local Storage: Browser
+      localStorage.setItem('userDetails', JSON.stringify({
+        name: userData.personalDetails.fullName,
+        email: userData.email,
+        department: userData.academicDetails.department,
+        year: userData.academicDetails.year
+      }));
+
       navigate('/dashboard/daily');
     } catch (error) {
       setError(error.message);
+      console.error('Registration error:', error);
     } finally {
       setLoading(false);
     }
@@ -121,6 +211,7 @@ const Register = () => {
                   }));
                 }}
                 placeholder="Enter your first name"
+                error={validationErrors.firstName}
                 className="bg-[#0A192F] border-[#233554] text-white"
               />
               <Input
@@ -247,7 +338,7 @@ const Register = () => {
               value={formData.confirmPassword}
               onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
               placeholder="Confirm your password"
-              error={error}
+              error={validationErrors.confirmPassword}
               className="bg-[#0A192F] border-[#233554] text-white"
             />
           </motion.div>

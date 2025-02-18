@@ -15,7 +15,7 @@ const LandingPage = () => {
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.5, 0]);
 
-  return (
+    return (
     <div className="min-h-screen bg-[#0A192F] overflow-hidden" ref={ref}>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[#0A192F]/80 border-b border-[#112240]">
