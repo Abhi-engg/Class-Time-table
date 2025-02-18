@@ -12,6 +12,7 @@ import DailyView from './pages/dashboard/DailyView';
 import WeeklyView from './pages/dashboard/WeeklyView';
 import CalendarView from './pages/dashboard/CalendarView';
 import Settings from './pages/dashboard/Settings';
+import ExamView from './pages/dashboard/ExamView';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -68,6 +69,7 @@ const App = () => {
             <Route path="weekly" element={<WeeklyView />} />
             <Route path="calendar" element={<CalendarView />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="exams" element={<ExamView />} />
           </Route>
 
           {/* 404 Route */}

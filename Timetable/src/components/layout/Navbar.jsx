@@ -34,17 +34,27 @@ const Navbar = () => {
     }
   };
 
-  // Navigation items
+  // Updated navigation items
   const mainNavItems = [
     { path: '/dashboard/daily', label: 'Daily View' },
     { path: '/dashboard/weekly', label: 'Weekly View' },
     { path: '/dashboard/calendar', label: 'Calendar' },
+    { path: '/dashboard/exams', label: 'Exam Schedule' }
   ];
 
   const resourceItems = [
     { path: '/dashboard/materials', label: 'Study Materials' },
     { path: '/dashboard/assignments', label: 'Assignments' },
-    { path: '/dashboard/exams', label: 'Exam Schedule' },
+    { 
+      path: '/dashboard/exams', 
+      label: 'Exam Schedule',
+      icon: (
+        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      ),
+      highlight: true
+    },
     { path: '/dashboard/faculty', label: 'Faculty Directory' },
   ];
 
@@ -136,10 +146,19 @@ const Navbar = () => {
                           key={item.path}
                           to={item.path}
                           className={({ isActive }) =>
-                            `block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors
-                            ${isActive ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' : ''}`
+                            `block px-4 py-2 text-sm flex items-center
+                            ${item.highlight 
+                              ? 'text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-900/30' 
+                              : 'text-gray-700 dark:text-gray-300'
+                            }
+                            ${isActive 
+                              ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' 
+                              : 'hover:bg-indigo-50 dark:hover:bg-gray-700'
+                            }
+                            transition-colors`
                           }
                         >
+                          {item.icon}
                           {item.label}
                         </NavLink>
                       ))}
