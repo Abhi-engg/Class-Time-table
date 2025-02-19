@@ -188,7 +188,7 @@ const Login = () => {
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background-color: rgba(156, 163, 175, 0.7);
     }
-  `;
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
