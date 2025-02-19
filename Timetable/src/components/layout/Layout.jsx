@@ -1,11 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
-import MobileNavigation from './MobileNavigation';
+import MobileNavigation from '../MobileNavigation';
 
 const Layout = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Desktop Navigation */}
       <Navbar />
 
@@ -15,7 +15,7 @@ const Layout = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="pt-16 pb-16 md:pb-0"
+          className="pt-16 pb-20"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <Outlet />
