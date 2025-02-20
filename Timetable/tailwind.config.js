@@ -21,6 +21,10 @@ module.exports = {
           900: '#0c4a6e',
         },
       },
+      fontFamily: {
+        'clash': ['Clash Display', 'sans-serif'],
+        'cabinet': ['Cabinet Grotesk', 'sans-serif'],
+      }
     },
   },
   plugins: [],
