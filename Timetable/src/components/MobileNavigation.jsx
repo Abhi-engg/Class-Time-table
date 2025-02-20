@@ -28,17 +28,9 @@ const MobileNavigation = () => {
           className="p-2 rounded-full bg-white dark:bg-gray-800 shadow-lg"
         >
           <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-            {currentUser?.profileImage ? (
-              <img 
-                src={currentUser.profileImage} 
-                alt={currentUser?.personalDetails?.fullName} 
-                className="w-8 h-8 rounded-full"
-              />
-            ) : (
-              <span className="text-lg text-indigo-600 dark:text-indigo-400">
-                {currentUser?.personalDetails?.firstName?.[0] || '?'}
-              </span>
-            )}
+            <span className="text-lg text-indigo-600 dark:text-indigo-400">
+              {currentUser?.firstName?.[0] || '?'}
+            </span>
           </div>
         </motion.button>
 
@@ -56,15 +48,15 @@ const MobileNavigation = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
                     <span className="text-lg text-indigo-600 dark:text-indigo-400">
-                      {currentUser?.personalDetails?.firstName?.[0] || '?'}
+                      {currentUser?.firstName?.[0] || '?'}
                     </span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {currentUser?.personalDetails?.fullName}
+                      {currentUser?.name || 'User'}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {currentUser?.personalDetails?.email}
+                      {currentUser?.email || 'No email'}
                     </p>
                   </div>
                 </div>
@@ -76,19 +68,19 @@ const MobileNavigation = () => {
                   <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                     <p className="text-gray-500 dark:text-gray-400">Class</p>
                     <p className="font-medium text-gray-900 dark:text-white mt-1">
-                      {currentUser?.academicDetails?.className || 'N/A'}
+                      {currentUser?.className || 'N/A'}
                     </p>
                   </div>
                   <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                     <p className="text-gray-500 dark:text-gray-400">Roll No</p>
                     <p className="font-medium text-gray-900 dark:text-white mt-1">
-                      {currentUser?.academicDetails?.rollNumber || 'N/A'}
+                      {currentUser?.rollNumber || 'N/A'}
                     </p>
                   </div>
                   <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                     <p className="text-gray-500 dark:text-gray-400">Year</p>
                     <p className="font-medium text-gray-900 dark:text-white mt-1">
-                      {currentUser?.academicDetails?.year || 'N/A'}
+                      {currentUser?.year || 'N/A'}
                     </p>
                   </div>
                 </div>

@@ -1,4 +1,3 @@
-// import React from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import Card from '../../components/common/Card';

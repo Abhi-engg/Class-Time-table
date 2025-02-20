@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import TimeTable from '../../components/ui/TimeTable';
 
@@ -73,7 +73,7 @@ const DailyView = () => {
         {/* Timetable Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Today's Schedule
+            Today&apos;s Schedule
           </h2>
           <div className="overflow-x-auto">
             <TimeTable isMobileView={isMobileView} />
