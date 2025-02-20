@@ -1,4 +1,4 @@
-import  { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 export const AuthContext = createContext();
@@ -8,9 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setCurrentUser(JSON.parse(user));
+    // Try to restore user session from localStorage
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
@@ -26,13 +27,22 @@ export const AuthProvider = ({ children }) => {
       const { confirmPassword, ...userDetails } = userData;
       
       // Validate required fields
-      if (!userDetails.email || !userDetails.password) {
-        throw new Error('Email and password are required');
+      const requiredFields = ['email', 'password', 'firstName', 'lastName', 'department', 'year', 'className', 'rollNumber'];
+      const missingFields = requiredFields.filter(field => !userDetails[field]);
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userDetails.email)) {
+        throw new Error('Invalid email format');
       }
 
       // Check if user already exists
       const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      if (existingUsers.find(user => user.email === userDetails.email)) {
+      if (existingUsers.find(user => user.email.toLowerCase() === userDetails.email.toLowerCase())) {
         throw new Error('User with this email already exists');
       }
 
@@ -40,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       const newUser = {
         id: 'user_' + Math.random().toString(36).substr(2, 9),
         email: userDetails.email.toLowerCase(),
-        password: userDetails.password, // In real app, hash password
+        password: userDetails.password, // In production, use proper password hashing
         name: `${userDetails.firstName} ${userDetails.lastName}`,
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
@@ -57,9 +67,10 @@ export const AuthProvider = ({ children }) => {
       existingUsers.push(newUser);
       localStorage.setItem('users', JSON.stringify(existingUsers));
 
-      // Set current user
+      // Set current user (without password)
       const { password, ...userWithoutPassword } = newUser;
       setCurrentUser(userWithoutPassword);
+      localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
       
       return userWithoutPassword;
 
@@ -73,6 +84,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const { email, password } = credentials;
 
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+
       // Get users from storage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       
@@ -84,6 +99,10 @@ export const AuthProvider = ({ children }) => {
 
       if (!user) {
         throw new Error('Invalid email or password');
+      }
+
+      if (user.accountStatus !== 'active') {
+        throw new Error('Account is not active');
       }
 
       // Update last login
@@ -101,6 +120,7 @@ export const AuthProvider = ({ children }) => {
       // Set current user (without password)
       const { password: _, ...userWithoutPassword } = updatedUser;
       setCurrentUser(userWithoutPassword);
+      localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
 
       return userWithoutPassword;
 
@@ -115,11 +135,45 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('currentUser');
   };
 
+  const updateProfile = async (userId, updates) => {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userIndex = users.findIndex(u => u.id === userId);
+
+      if (userIndex === -1) {
+        throw new Error('User not found');
+      }
+
+      // Update user data
+      const updatedUser = {
+        ...users[userIndex],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+
+      users[userIndex] = updatedUser;
+      localStorage.setItem('users', JSON.stringify(users));
+
+      // Update current user if it's the same user
+      if (currentUser?.id === userId) {
+        const { password, ...userWithoutPassword } = updatedUser;
+        setCurrentUser(userWithoutPassword);
+        localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+      }
+
+      return updatedUser;
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw error;
+    }
+  };
+
   const value = {
     currentUser,
     register,
     login, 
     logout,
+    updateProfile,
     loading
   };
 
