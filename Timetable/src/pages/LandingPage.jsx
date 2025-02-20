@@ -129,25 +129,101 @@ const LandingPage = () => {
               </div>
             </motion.div>
 
-            {/* Animated Illustration */}
+            {/* Animated Timetable Illustration */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="relative"
             >
-              <div className="w-full h-[400px] bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg backdrop-blur-xl border border-slate-700">
-                {/* Calendar Grid Animation */}
-                <div className="grid grid-cols-5 gap-2 p-4">
-                  {[...Array(10)].map((_, i) => (
+              <div className="w-full h-[400px] bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg backdrop-blur-xl border border-slate-700 p-4">
+                {/* Timetable Header */}
+                <div className="grid grid-cols-6 gap-2 mb-4">
+                  <div className="h-12 rounded bg-white/5 border border-white/10 flex items-center justify-center">
+                    <span className="text-slate-300 text-sm">Time</span>
+                  </div>
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => (
                     <motion.div
-                      key={i}
-                      className="h-16 rounded bg-white/5 border border-white/10"
-                      initial={{ opacity: 0, y: 20 }}
+                      key={day}
+                      className="h-12 rounded bg-white/5 border border-white/10 flex items-center justify-center"
+                      initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.1 }}
-                    />
+                    >
+                      <span className="text-slate-300 text-sm">{day}</span>
+                    </motion.div>
                   ))}
+                </div>
+
+                {/* Timetable Body */}
+                {[9, 10, 11, 12].map((hour, rowIndex) => (
+                  <motion.div
+                    key={hour}
+                    className="grid grid-cols-6 gap-2 mb-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: rowIndex * 0.1 }}
+                  >
+                    <div className="h-16 rounded bg-white/5 border border-white/10 flex items-center justify-center">
+                      <span className="text-slate-400 text-sm">
+                        {`${hour}:00`}
+                      </span>
+                    </div>
+                    {[...Array(5)].map((_, i) => {
+                      const isClass = Math.random() > 0.5;
+                      return (
+                        <motion.div
+                          key={i}
+                          className={`h-16 rounded ${
+                            isClass 
+                              ? 'bg-blue-500/20 border-blue-500/30' 
+                              : 'bg-white/5 border-white/10'
+                          } border flex items-center justify-center p-2`}
+                          whileHover={{ scale: 1.05 }}
+                        >
+                          {isClass && (
+                            <div className="text-center">
+                              <div className="text-blue-400 text-xs font-medium mb-1">
+                                {['Math-4', 'Data Structures', 'DBMS', 'Mechanics', 'Operating System'][Math.floor(Math.random() * 5)]}
+                              </div>
+                              <div className="text-slate-400 text-xs">
+                                Room {Math.floor(Math.random() * 300) + 100}
+                              </div>
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </motion.div>
+                ))}
+
+                {/* Decorative Elements */}
+                <div className="absolute -bottom-4 -right-4">
+                  <svg
+                    width="120"
+                    height="120"
+                    viewBox="0 0 120 120"
+                    fill="none"
+                    className="opacity-30"
+                  >
+                    <circle cx="60" cy="60" r="30" stroke="currentColor" strokeWidth="2" className="text-blue-500" />
+                    <circle cx="60" cy="60" r="45" stroke="currentColor" strokeWidth="2" className="text-purple-500" opacity="0.7" />
+                    <circle cx="60" cy="60" r="60" stroke="currentColor" strokeWidth="2" className="text-indigo-500" opacity="0.4" />
+                  </svg>
+                </div>
+
+                {/* Clock Icon */}
+                <div className="absolute -top-4 -left-4 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+
+                {/* Calendar Icon */}
+                <div className="absolute -top-4 right-8 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
               </div>
             </motion.div>
@@ -211,8 +287,8 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Enhanced Student Testimonials Section with Horizontal Scroll */}
-      <div className="bg-slate-900 py-24 overflow-hidden" ref={testimonialRef}>
+      {/* Student Testimonials Section */}
+      <div className="bg-slate-900 py-24" ref={testimonialRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -228,28 +304,17 @@ const LandingPage = () => {
             </p>
           </motion.div>
 
-          {/* Horizontal Scrolling Container */}
-          <motion.div 
-            className="flex space-x-8 pb-8 overflow-visible"
-            style={{ x }}
-          >
+          {/* Grid Layout for Testimonials */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ 
-                  duration: 0.3,
-                  delay: index * 0.05,
-                  type: "spring",
-                  damping: 15
-                }}
-                className="flex-shrink-0 w-[350px] bg-slate-800/50 backdrop-blur-xl p-8 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all duration-300"
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { duration: 0.2 }
-                }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-slate-800/50 backdrop-blur-xl p-8 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
               >
                 {/* Quote Icon */}
                 <div className="absolute -top-4 -left-4 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -260,7 +325,7 @@ const LandingPage = () => {
 
                 {/* Testimonial Content */}
                 <div className="mb-6">
-                  <p className="text-slate-300 italic mb-4">&ldquo;{testimonial.quote}&rdquo;</p>
+                  <p className="text-slate-300 italic mb-4">"{testimonial.quote}"</p>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
                       {testimonial.name[0]}
@@ -272,27 +337,8 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Decorative Elements */}
-                <div className="absolute bottom-4 right-4 opacity-10">
-                  <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.57-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z" />
-                  </svg>
-                </div>
               </motion.div>
             ))}
-          </motion.div>
-
-          {/* Scroll Indicator */}
-          <div className="mt-8 flex justify-center items-center gap-2">
-            <motion.div 
-              className="h-1 w-32 bg-slate-700 rounded-full overflow-hidden"
-              style={{
-                background: "linear-gradient(to right, #3B82F6 var(--scroll), #1F2937 0)",
-                "--scroll": testimonialScrollYProgress.get() * 100 + "%"
-              }}
-            />
-            <span className="text-slate-400 text-sm">Scroll to explore</span>
           </div>
         </div>
       </div>
