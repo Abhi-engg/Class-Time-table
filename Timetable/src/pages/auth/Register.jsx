@@ -72,7 +72,6 @@ const Register = () => {
     if (!firstName) return '';
     const name = firstName.toLowerCase();
     const surname = lastName ? lastName.toLowerCase() : '';
-    const year = new Date().getFullYear().toString().slice(-2);
     
     return `${name}.${surname}@universal.edu.in`;
   };
@@ -396,6 +395,16 @@ const Register = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-3 text-sm text-red-500 bg-red-100/10 rounded-lg"
+              >
+                {error}
+              </motion.div>
+            )}
+            
             <AnimatePresence mode='wait'>
               {renderStepContent()}
             </AnimatePresence>
