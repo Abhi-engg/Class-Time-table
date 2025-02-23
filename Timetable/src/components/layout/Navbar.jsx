@@ -268,7 +268,7 @@ const Navbar = () => {
                       </div>
                     </div>
 
-                    {/* Quick Stats */}
+                    {/* Quick Stats
                     <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                       <div className="grid grid-cols-3 gap-4 text-center text-xs">
                         <div>
@@ -284,7 +284,7 @@ const Navbar = () => {
                           <p className="font-medium text-gray-900 dark:text-white">{currentUser?.upcomingEvents || '0'}</p>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Navigation Links */}
                     <div className="py-2">

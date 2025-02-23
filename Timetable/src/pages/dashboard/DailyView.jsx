@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import TimeTable from '../../components/ui/TimeTable';
+import { motion } from 'framer-motion';
 
 const DailyView = () => {
   const { currentUser } = useAuth();
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false);
+  const [nextClass, setNextClass] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -14,71 +18,191 @@ const DailyView = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Update next class every minute
+  useEffect(() => {
+    const updateNextClass = () => {
+      const classes = getTodayClasses();
+      const now = new Date();
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+
+      const nextClass = classes.find(classItem => {
+        const [time, period] = classItem.time.split(' ');
+        const [hours, minutes] = time.split(':');
+        let classHours = parseInt(hours);
+        if (period === 'PM' && classHours !== 12) classHours += 12;
+        if (period === 'AM' && classHours === 12) classHours = 0;
+        const classTime = classHours * 60 + parseInt(minutes);
+        return classTime > currentTime;
+      });
+
+      setNextClass(nextClass);
+    };
+
+    updateNextClass();
+    const interval = setInterval(updateNextClass, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [currentDate]);
+
+  const navigateDay = async (direction) => {
+    setIsLoading(true);
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + direction);
+    setCurrentDate(newDate);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setIsLoading(false);
+  };
+
+  const getTodayClasses = () => {
+    const dayOfWeek = currentDate.getDay();
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    
+    const scheduleData = {
+      monday: [
+        { time: '9:00 AM', subject: 'Mathematics', room: '101', type: 'Lecture', teacher: 'Dr. Smith' },
+        { time: '11:00 AM', subject: 'Physics', room: '102', type: 'Lab', teacher: 'Prof. Johnson' },
+        { time: '12:00 PM', subject: 'Lunch Break', type: 'break' },
+        { time: '2:00 PM', subject: 'Chemistry', room: '103', type: 'Lecture', teacher: 'Dr. Brown' },
+      ],
+      tuesday: [
+        { time: '9:00 AM', subject: 'Computer Science', room: '201', type: 'Lab', teacher: 'Prof. Wilson' },
+        { time: '11:00 AM', subject: 'English', room: '202', type: 'Lecture', teacher: 'Mrs. Davis' },
+        { time: '12:00 PM', subject: 'Lunch Break', type: 'break' },
+        { time: '2:00 PM', subject: 'Physics', room: '203', type: 'Lecture', teacher: 'Prof. Johnson' },
+      ],
+      wednesday: [
+        { time: '9:00 AM', subject: 'Chemistry', room: '301', type: 'Lab', teacher: 'Dr. Brown' },
+        { time: '11:00 AM', subject: 'Mathematics', room: '302', type: 'Lecture', teacher: 'Dr. Smith' },
+        { time: '12:00 PM', subject: 'Lunch Break', type: 'break' },
+        { time: '2:00 PM', subject: 'English', room: '303', type: 'Lecture', teacher: 'Mrs. Davis' },
+      ],
+      thursday: [
+        { time: '9:00 AM', subject: 'Physics', room: '401', type: 'Lab', teacher: 'Prof. Johnson' },
+        { time: '11:00 AM', subject: 'Computer Science', room: '402', type: 'Lecture', teacher: 'Prof. Wilson' },
+        { time: '12:00 PM', subject: 'Lunch Break', type: 'break' },
+        { time: '2:00 PM', subject: 'Mathematics', room: '403', type: 'Lecture', teacher: 'Dr. Smith' },
+      ],
+      friday: [
+        { time: '9:00 AM', subject: 'English', room: '501', type: 'Lecture', teacher: 'Mrs. Davis' },
+        { time: '11:00 AM', subject: 'Chemistry', room: '502', type: 'Lab', teacher: 'Dr. Brown' },
+        { time: '12:00 PM', subject: 'Lunch Break', type: 'break' },
+        { time: '2:00 PM', subject: 'Computer Science', room: '503', type: 'Lecture', teacher: 'Prof. Wilson' },
+      ]
+    };
+
+    return scheduleData[days[dayOfWeek]] || [];
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-3 sm:p-4 md:p-6">
-      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-white/30 via-blue-50/20 to-indigo-50/30 
+                    dark:from-gray-900/30 dark:via-blue-900/20 dark:to-indigo-900/30 p-4">
+      <div className="max-w-4xl mx-auto space-y-4">
         {/* Header Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome, {currentUser?.name || 'Guest'}!
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-sm p-4 
+                     border border-gray-200/50 dark:border-gray-700/50"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              Today&apos;s Schedule
             </h1>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigateDay(-1)}
+                disabled={isLoading}
+                className="p-2 rounded-lg bg-white/70 dark:bg-gray-800/70 text-gray-600 dark:text-gray-400 
+                         hover:bg-white/90 dark:hover:bg-gray-700/90 transition-all duration-200
+                         disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                {currentDate.toLocaleDateString('en-US', {
+                  weekday: isMobileView ? 'short' : 'long',
+                  month: isMobileView ? 'short' : 'long',
+                  day: 'numeric'
+                })}
+              </span>
+              <button
+                onClick={() => navigateDay(1)}
+                disabled={isLoading}
+                className="p-2 rounded-lg bg-white/70 dark:bg-gray-800/70 text-gray-600 dark:text-gray-400 
+                         hover:bg-white/90 dark:hover:bg-gray-700/90 transition-all duration-200
+                         disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* User Info Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
-            <h3 className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-              Department
-            </h3>
-            <p className="mt-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
-              {currentUser?.department || 'N/A'}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
-            <h3 className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-              Year
-            </h3>
-            <p className="mt-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
-              {currentUser?.year || 'N/A'}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
-            <h3 className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-              Class
-            </h3>
-            <p className="mt-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
-              {currentUser?.className || 'N/A'}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm">
-            <h3 className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-              Roll Number
-            </h3>
-            <p className="mt-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
-              {currentUser?.rollNumber || 'N/A'}
-            </p>
-          </div>
-        </div>
+          {/* Next Class Info */}
+          {nextClass && (
+            <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-lg p-3 
+                          border border-blue-200/50 dark:border-blue-700/50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    Next Class
+                  </p>
+                  <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                    {nextClass.subject}
+                  </h3>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    {nextClass.time}
+                  </p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    Room {nextClass.room}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
 
         {/* Timetable Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Today&apos;s Schedule
-          </h2>
-          <div className="overflow-x-auto">
-            <TimeTable isMobileView={isMobileView} />
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-sm p-4 
+                     border border-gray-200/50 dark:border-gray-700/50"
+        >
+          <TimeTable 
+            isMobileView={isMobileView} 
+            currentDate={currentDate}
+            classes={getTodayClasses()}
+            getClassTypeColor={(type) => {
+              switch (type) {
+                case 'Lecture':
+                  return 'bg-blue-500/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300';
+                case 'Lab':
+                  return 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300';
+                case 'break':
+                  return 'bg-amber-500/10 dark:bg-amber-400/10 text-amber-700 dark:text-amber-300';
+                default:
+                  return 'bg-gray-500/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-300';
+              }
+            }}
+            getClassBgColor={(type) => {
+              switch (type) {
+                case 'Lecture':
+                  return 'bg-blue-50/50 dark:bg-blue-900/20 hover:bg-blue-100/50 dark:hover:bg-blue-900/30';
+                case 'Lab':
+                  return 'bg-purple-50/50 dark:bg-purple-900/20 hover:bg-purple-100/50 dark:hover:bg-purple-900/30';
+                case 'break':
+                  return 'bg-amber-50/50 dark:bg-amber-900/20 hover:bg-amber-100/50 dark:hover:bg-amber-900/30';
+                default:
+                  return 'bg-gray-50/50 dark:bg-gray-900/20 hover:bg-gray-100/50 dark:hover:bg-gray-900/30';
+              }
+            }}
+          />
+        </motion.div>
       </div>
     </div>
   );
