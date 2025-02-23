@@ -142,7 +142,7 @@ const DailyView = () => {
           {nextClass && (
             <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-lg p-3 
                           border border-blue-200/50 dark:border-blue-700/50">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                 <div>
                   <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
                     Next Class
@@ -150,14 +150,31 @@ const DailyView = () => {
                   <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
                     {nextClass.subject}
                   </h3>
+                  {nextClass.teacher && (
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                      {nextClass.teacher}
+                    </p>
+                  )}
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    {nextClass.time}
-                  </p>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    Room {nextClass.room}
-                  </p>
+                <div className="flex justify-between sm:justify-end items-center sm:text-right gap-4 sm:gap-6 mt-2 sm:mt-0">
+                  <div>
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      Time
+                    </p>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      {nextClass.time}
+                    </p>
+                  </div>
+                  {nextClass.room && (
+                    <div>
+                      <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        Room
+                      </p>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        {nextClass.room}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
