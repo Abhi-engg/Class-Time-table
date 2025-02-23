@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState, useEffect } from 'react'
 import TimeTable from '../../components/ui/TimeTable';
 import { motion } from 'framer-motion';
 
 const DailyView = () => {
-  const { currentUser } = useAuth();
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
