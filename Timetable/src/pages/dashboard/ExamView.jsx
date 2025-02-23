@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ExamView = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [weekDates, setWeekDates] = useState([]);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -208,23 +209,108 @@ const ExamView = () => {
           ))}
         </div>
 
-        {/* Important Instructions */}
+        {/* Important Instructions with Dropdown Animation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-sm p-4 
-                     border border-gray-200/50 dark:border-gray-700/50"
+          className="bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-sm overflow-hidden
+                     border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300"
         >
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Important Instructions
-          </h2>
-          <ul className="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-300">
-            <li>Arrive at least 15 minutes before the examination time</li>
-            <li>Bring your student ID card and hall ticket</li>
-            <li>No electronic devices allowed in the examination hall</li>
-            <li>Read all questions carefully before attempting</li>
-            <li>Write your roll number on every page</li>
-          </ul>
+          <motion.button
+            onClick={() => setIsInstructionsOpen(!isInstructionsOpen)}
+            className="w-full p-4 flex items-center justify-between text-left
+                       hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            <div className="flex items-center gap-3">
+              <svg 
+                className="w-5 h-5 text-indigo-500 dark:text-indigo-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                />
+              </svg>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Important Instructions
+              </h2>
+            </div>
+            <motion.svg
+              className="w-5 h-5 text-gray-500 dark:text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              animate={{ rotate: isInstructionsOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </motion.svg>
+          </motion.button>
+
+          <AnimatePresence>
+            {isInstructionsOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="border-t border-gray-200 dark:border-gray-700"
+              >
+                <motion.div
+                  initial={{ y: -10 }}
+                  animate={{ y: 0 }}
+                  exit={{ y: -10 }}
+                  className="p-4 space-y-4"
+                >
+                  {[
+                    { icon: "⏰", text: "Arrive at least 15 minutes before the examination time" },
+                    { icon: "🪪", text: "Bring your student ID card and hall ticket" },
+                    { icon: "📱", text: "No electronic devices allowed in the examination hall" },
+                    { icon: "📝", text: "Read all questions carefully before attempting" },
+                    { icon: "🔢", text: "Write your roll number on every page" }
+                  ].map((instruction, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start gap-3 p-3 rounded-lg
+                                 bg-gray-50/50 dark:bg-gray-700/50
+                                 hover:bg-gray-100/50 dark:hover:bg-gray-600/50
+                                 transition-colors duration-200"
+                    >
+                      <span className="text-xl">{instruction.icon}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {instruction.text}
+                      </span>
+                    </motion.div>
+                  ))}
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mt-4 p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/20
+                               border border-indigo-100 dark:border-indigo-800"
+                  >
+                    <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                      Note: Failure to comply with these instructions may result in disciplinary action.
+                    </p>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
     </div>
