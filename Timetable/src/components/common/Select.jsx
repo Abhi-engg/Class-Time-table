@@ -98,8 +98,8 @@ const Select = ({
           relative w-full rounded-lg
           px-4 py-2.5
           text-left
-          bg-white/80 dark:bg-gray-800/80
-          border border-gray-200/50 dark:border-gray-700/50
+          bg-white dark:bg-gray-800
+          border border-gray-200 dark:border-gray-700
           transition-all duration-200
           ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-400'}
           ${error ? 'border-red-500 dark:border-red-400' : ''}
@@ -132,8 +132,8 @@ const Select = ({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="absolute z-50 w-full mt-1 bg-white/80 dark:bg-gray-800/80 rounded-lg shadow-lg 
-                     border border-gray-200/50 dark:border-gray-700/50"
+            className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg 
+                     border border-gray-200 dark:border-gray-700"
           >
             <motion.div 
               className="max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
@@ -155,8 +155,8 @@ const Select = ({
                     px-4 py-2 cursor-pointer
                     transition-colors duration-150
                     ${value === option.value
-                      ? 'bg-indigo-50/50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                      : 'text-gray-900 dark:text-white hover:bg-gray-100/50 dark:hover:bg-gray-700/50'
+                      ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                      : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                     }
                   `}
                 >

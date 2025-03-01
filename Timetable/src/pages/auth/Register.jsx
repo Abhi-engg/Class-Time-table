@@ -276,7 +276,7 @@ const Register = () => {
                 const value = e.target.value.toUpperCase();
                 setFormData(prev => ({ ...prev, rollNumber: value }));
               }}
-              placeholder="Enter your roll number (e.g., 21CO123)"
+              placeholder="Enter your roll number (e.g., 101)"
               className="bg-[#0A192F] border-[#233554] text-white"
             />
             <div className="space-y-2">
@@ -354,7 +354,7 @@ const Register = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full"
       >
-        <Card className="space-y-6 p-8 bg-[#112240] border border-[#233554] shadow-xl">
+        <Card className="space-y-6 p-7 py-13 bg-[#112240] border border-[#233554] shadow-xl">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-white">
               Create your account

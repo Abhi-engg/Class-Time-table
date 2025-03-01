@@ -47,7 +47,7 @@ Card.Header = ({ children, className = '' }) => (
 );
 
 Card.Body = ({ children, className = '' }) => (
-  <div className={`px-6 py-4 ${className}`}>
+  <div className={`px-8 py-4 ${className}`}>
     {children}
   </div>
 );

@@ -171,8 +171,8 @@ const Navbar = () => {
                     animate="visible"
                     exit="exit"
                     className="dropdown-content absolute right-0 mt-2 w-48 rounded-lg shadow-lg 
-                             bg-white/80 dark:bg-gray-800/80 backdrop-blur-md 
-                             border border-gray-200/50 dark:border-gray-700/50"
+                             bg-white dark:bg-gray-800
+                             border border-gray-200 dark:border-gray-700"
                   >
                     <div className="py-1">
                       {resourceItems.map((item) => (
@@ -238,11 +238,11 @@ const Navbar = () => {
                     animate="visible"
                     exit="exit"
                     className="dropdown-content absolute right-0 mt-2 w-80 rounded-lg shadow-lg 
-                             bg-white/80 dark:bg-gray-800/80 backdrop-blur-md 
-                             border border-gray-200/50 dark:border-gray-700/50"
+                             bg-white dark:bg-gray-800
+                             border border-gray-200 dark:border-gray-700"
                   >
                     {/* User Header Info */}
-                    <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
                           <div className="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center overflow-hidden">
