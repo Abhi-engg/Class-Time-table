@@ -33,12 +33,14 @@ const Input = forwardRef(({
             ${rightIcon ? 'pr-10' : 'pr-4'}
             py-2.5
             text-gray-900 dark:text-white
-            bg-white dark:bg-gray-800
-            border border-gray-300 dark:border-gray-700
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            bg-white/80 dark:bg-gray-800/80
+            border border-gray-200/50 dark:border-gray-700/50
+            focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50
+            dark:focus:ring-indigo-400/50 dark:focus:border-indigo-400/50
             disabled:opacity-60 disabled:cursor-not-allowed
             transition-colors duration-200
-            ${error ? 'border-red-500 dark:border-red-400' : ''}
+            placeholder:text-gray-500 dark:placeholder:text-gray-400
+            ${error ? 'border-red-500 dark:border-red-400 focus:ring-red-500/50 focus:border-red-500/50' : ''}
             ${className}
           `}
           {...props}

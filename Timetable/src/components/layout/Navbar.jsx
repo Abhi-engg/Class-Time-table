@@ -1,36 +1,77 @@
-import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
+  const { rollNumber, department, year, className } = currentUser || {};
   const navigate = useNavigate();
+  const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  // Close dropdowns on route change
+  useEffect(() => {
+    closeAllDropdowns();
+  }, [location.pathname]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isDropdownClick = event.target.closest('.dropdown-trigger');
+      const isDropdownContent = event.target.closest('.dropdown-content');
+      
+      if (!isDropdownClick && !isDropdownContent) {
+        closeAllDropdowns();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const closeAllDropdowns = () => {
+    setIsProfileOpen(false);
+    setIsResourcesOpen(false);
+  };
+
+  const handleDropdownClick = (dropdownType) => {
+    if (dropdownType === 'profile') {
+      setIsProfileOpen(!isProfileOpen);
+      setIsResourcesOpen(false);
+    } else if (dropdownType === 'resources') {
+      setIsResourcesOpen(!isResourcesOpen);
+      setIsProfileOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      closeAllDropdowns();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   // Animation variants
   const dropdownVariants = {
-    hidden: { opacity: 0, y: -10 },
+    hidden: { 
+      opacity: 0,
+      y: -10,
+      transition: { duration: 0.2, ease: "easeInOut" }
+    },
     visible: { 
-      opacity: 1, 
+      opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.2,
-        ease: "easeOut"
-      }
+      transition: { duration: 0.3, ease: "easeOut" }
     },
     exit: { 
-      opacity: 0, 
+      opacity: 0,
       y: -10,
-      transition: {
-        duration: 0.2
-      }
+      transition: { duration: 0.2, ease: "easeInOut" }
     }
   };
 
@@ -45,16 +86,6 @@ const Navbar = () => {
   const resourceItems = [
     { path: '/dashboard/materials', label: 'Study Materials' },
     { path: '/dashboard/assignments', label: 'Assignments' },
-    { 
-      path: '/dashboard/exams', 
-      label: 'Exam Schedule',
-      icon: (
-        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      ),
-      highlight: true
-    },
     { path: '/dashboard/faculty', label: 'Faculty Directory' },
   ];
 
@@ -65,7 +96,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-lg fixed w-full top-0 left-0 z-50">
+    <nav className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg fixed w-full top-0 left-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and Brand */}
@@ -98,8 +129,9 @@ const Navbar = () => {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={closeAllDropdowns}
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded-md text-sm font-medium transition-all duration-200
+                  `px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                   ${isActive 
                     ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md' 
                     : 'text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700'
@@ -113,15 +145,15 @@ const Navbar = () => {
             {/* Resources Dropdown */}
             <div className="relative">
               <button
-                onClick={() => {
-                  setIsResourcesOpen(!isResourcesOpen);
-                  setIsProfileOpen(false);
-                }}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200 flex items-center"
+                className="dropdown-trigger px-3 py-2 rounded-lg text-sm font-medium text-gray-600 
+                         dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 
+                         transition-all duration-200 flex items-center"
+                onClick={() => handleDropdownClick('resources')}
               >
                 <span>Resources</span>
                 <motion.svg
                   animate={{ rotate: isResourcesOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
                   className="ml-2 h-4 w-4"
                   fill="none"
                   stroke="currentColor"
@@ -138,7 +170,9 @@ const Navbar = () => {
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                    className="dropdown-content absolute right-0 mt-2 w-48 rounded-lg shadow-lg 
+                             bg-white/80 dark:bg-gray-800/80 backdrop-blur-md 
+                             border border-gray-200/50 dark:border-gray-700/50"
                   >
                     <div className="py-1">
                       {resourceItems.map((item) => (
@@ -146,19 +180,14 @@ const Navbar = () => {
                           key={item.path}
                           to={item.path}
                           className={({ isActive }) =>
-                            `block px-4 py-2 text-sm flex items-center
-                            ${item.highlight 
-                              ? 'text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-900/30' 
-                              : 'text-gray-700 dark:text-gray-300'
-                            }
+                            `block px-4 py-2 text-sm
                             ${isActive 
                               ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' 
-                              : 'hover:bg-indigo-50 dark:hover:bg-gray-700'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700'
                             }
                             transition-colors`
                           }
                         >
-                          {item.icon}
                           {item.label}
                         </NavLink>
                       ))}
@@ -171,11 +200,10 @@ const Navbar = () => {
             {/* Profile Dropdown */}
             <div className="relative">
               <button
-                onClick={() => {
-                  setIsProfileOpen(!isProfileOpen);
-                  setIsResourcesOpen(false);
-                }}
-                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200"
+                className="dropdown-trigger flex items-center space-x-2 px-3 py-2 rounded-lg 
+                         text-sm font-medium text-gray-600 dark:text-gray-300 
+                         hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-200"
+                onClick={() => handleDropdownClick('profile')}
               >
                 <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
                   {currentUser?.profileImage ? (
@@ -209,105 +237,104 @@ const Navbar = () => {
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    className="absolute right-0 mt-2 w-72 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                    className="dropdown-content absolute right-0 mt-2 w-80 rounded-lg shadow-lg 
+                             bg-white/80 dark:bg-gray-800/80 backdrop-blur-md 
+                             border border-gray-200/50 dark:border-gray-700/50"
                   >
-                    {/* User Profile Header */}
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                          {currentUser?.profileImage ? (
-                            <img 
-                              src={currentUser.profileImage} 
-                              alt={currentUser?.name} 
-                              className="w-12 h-12 rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-xl text-indigo-600 dark:text-indigo-400 font-medium">
-                              {currentUser?.name?.[0] || currentUser?.email?.[0] || '?'}
-                            </span>
-                          )}
+                    {/* User Header Info */}
+                    <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative">
+                          <div className="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center overflow-hidden">
+                            {currentUser?.profileImage ? (
+                              <img 
+                                src={currentUser.profileImage} 
+                                alt={currentUser?.name} 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-2xl text-indigo-600 dark:text-indigo-400 font-medium">
+                                {currentUser?.name?.[0] || currentUser?.email?.[0] || '?'}
+                              </span>
+                            )}
+                          </div>
+                          <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-green-500 border-2 border-white dark:border-gray-800" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                             {currentUser?.name || 'Guest User'}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          </h2>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                             {currentUser?.email || 'No email'}
                           </p>
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full">
+                              Roll No: {rollNumber || 'N/A'}
+                            </span>
+                            <span className="text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full">
+                              Class: {className || 'N/A'}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* User Details */}
-                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-gray-500 dark:text-gray-400">Department</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {currentUser?.department || 'N/A'}
+                      
+                      {/* Academic Info */}
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+                          <p className="text-gray-500 dark:text-gray-400 text-xs">Department</p>
+                          <p className="text-gray-900 dark:text-white font-medium truncate">
+                            {department || 'Not Set'}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-gray-500 dark:text-gray-400">Year</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {currentUser?.year || 'N/A'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-500 dark:text-gray-400">Roll Number</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {currentUser?.rollNumber || 'N/A'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-500 dark:text-gray-400">Class</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {currentUser?.className || 'N/A'}
+                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+                          <p className="text-gray-500 dark:text-gray-400 text-xs">Year</p>
+                          <p className="text-gray-900 dark:text-white font-medium">
+                            {year || 'Not Set'}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Quick Stats
-                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                      <div className="grid grid-cols-3 gap-4 text-center text-xs">
+                    {/* Quick Stats */}
+                    <div className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
+                      <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-gray-500 dark:text-gray-400">Attendance</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{currentUser?.attendance || '0'}%</p>
+                          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Classes</p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">{currentUser?.classesCount || '0'}</p>
                         </div>
                         <div>
-                          <p className="text-gray-500 dark:text-gray-400">Assignments</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{currentUser?.completedAssignments || '0'}</p>
+                          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Assignments</p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">{currentUser?.assignmentsCount || '0'}</p>
                         </div>
                         <div>
-                          <p className="text-gray-500 dark:text-gray-400">Events</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{currentUser?.upcomingEvents || '0'}</p>
+                          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Attendance</p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">{currentUser?.attendancePercentage || '0'}%</p>
                         </div>
                       </div>
-                    </div> */}
+                    </div>
 
-                    {/* Navigation Links */}
                     <div className="py-2">
                       {profileItems.map((item) => (
                         <NavLink
                           key={item.path}
                           to={item.path}
                           className={({ isActive }) =>
-                            `flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors
-                            ${isActive ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' : ''}`
+                            `block px-4 py-2 text-sm
+                            ${isActive 
+                              ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-700'
+                            }
+                            transition-colors`
                           }
                         >
-                          {item.icon && <span className="mr-2">{item.icon}</span>}
                           {item.label}
                         </NavLink>
                       ))}
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 
+                                 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
                         Logout
                       </button>
                     </div>

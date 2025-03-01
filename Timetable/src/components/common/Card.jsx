@@ -10,18 +10,20 @@ const Card = ({
 }) => {
   const BaseCard = hover ? motion.div : 'div';
   const hoverProps = hover ? {
-    whileHover: { scale: 1.02 },
-    whileTap: { scale: 0.98 }
+    whileHover: { scale: 1.01 },
+    whileTap: { scale: 0.99 },
+    transition: { duration: 0.2 }
   } : {};
 
   return (
     <BaseCard
       className={`
-        bg-white dark:bg-gray-800
-        rounded-lg shadow-sm
-        border border-gray-200 dark:border-gray-700
+        bg-white/80 dark:bg-gray-800/80
+        rounded-xl shadow-sm
+        border border-gray-200/50 dark:border-gray-700/50
         overflow-hidden
-        ${onClick ? 'cursor-pointer' : ''}
+        transition-all duration-200
+        ${onClick ? 'cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-400' : ''}
         ${className}
       `}
       onClick={onClick}
@@ -35,7 +37,11 @@ const Card = ({
 
 // Card subcomponents
 Card.Header = ({ children, className = '' }) => (
-  <div className={`px-6 py-4 border-b border-gray-200 dark:border-gray-700 ${className}`}>
+  <div className={`
+    px-6 py-4 
+    border-b border-gray-200/50 dark:border-gray-700/50
+    ${className}
+  `}>
     {children}
   </div>
 );
@@ -47,7 +53,11 @@ Card.Body = ({ children, className = '' }) => (
 );
 
 Card.Footer = ({ children, className = '' }) => (
-  <div className={`px-6 py-4 border-t border-gray-200 dark:border-gray-700 ${className}`}>
+  <div className={`
+    px-6 py-4 
+    border-t border-gray-200/50 dark:border-gray-700/50
+    ${className}
+  `}>
     {children}
   </div>
 );

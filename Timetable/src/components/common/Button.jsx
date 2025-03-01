@@ -7,9 +7,9 @@ const variants = {
   secondary: 'bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-900 dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 dark:text-white shadow-gray-500/25',
   danger: 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-red-500/25',
   success: 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-green-500/25',
-  outline: 'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-900/30 shadow-indigo-500/25',
-  glass: 'backdrop-blur-md bg-white/10 border border-white/20 text-white hover:bg-white/20 shadow-white/25',
-  neon: 'bg-transparent border-2 border-indigo-500 text-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] hover:border-indigo-400 hover:text-indigo-400 shadow-indigo-500/25',
+  outline: 'border-2 border-indigo-500/50 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-400/50 dark:text-indigo-400 dark:hover:bg-indigo-900/30',
+  glass: 'backdrop-blur-md bg-white/10 border border-white/20 text-white hover:bg-white/20',
+  neon: 'bg-transparent border-2 border-indigo-500/50 text-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] hover:border-indigo-400 hover:text-indigo-400',
 };
 
 const sizes = {
@@ -90,27 +90,7 @@ const animations = {
       }
     },
     tap: { y: 2 }
-  },
-  shine: {
-    initial: { 
-      background: "linear-gradient(45deg, transparent 0%, transparent 100%)",
-      backgroundSize: "200% 200%",
-      backgroundPosition: "0% 0%"
-    },
-    hover: {
-      backgroundPosition: "100% 100%",
-      transition: { duration: 0.8, ease: "easeInOut" }
-    }
   }
-};
-
-const getButtonClasses = (variant, size, disabled) => {
-  const baseClasses = 'rounded-lg shadow-lg focus:outline-none';
-  const variantClasses = variants[variant];
-  const sizeClasses = sizes[size];
-  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
-  
-  return `${baseClasses} ${variantClasses} ${sizeClasses} ${disabledClasses}`;
 };
 
 const Button = ({
@@ -148,7 +128,6 @@ const Button = ({
     setRippleEffect(rippleEffect.filter(ripple => ripple.id !== id));
   };
 
-  // Enhanced error animation with smoother transitions
   const errorAnimation = {
     initial: { 
       x: 0,
@@ -164,10 +143,7 @@ const Button = ({
       }
     } : {
       x: 0,
-      borderColor: 'transparent',
-      transition: {
-        duration: 0.2
-      }
+      borderColor: 'transparent'
     }
   };
 
@@ -179,8 +155,11 @@ const Button = ({
         className={`
           relative overflow-hidden
           inline-flex items-center justify-center
+          rounded-lg shadow-sm
           transition-all duration-200
-          ${getButtonClasses(variant, size, disabled)}
+          ${variants[variant]}
+          ${sizes[size]}
+          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           ${error ? 'border-2 border-red-500 dark:border-red-400' : ''}
           ${className}
         `}
@@ -195,22 +174,24 @@ const Button = ({
         {...props}
       >
         {/* Ripple effect */}
-        {rippleEffect.map(ripple => (
-          <motion.span
-            key={ripple.id}
-            className="absolute bg-white/30 rounded-full"
-            style={{
-              left: ripple.x,
-              top: ripple.y,
-              width: ripple.size,
-              height: ripple.size,
-            }}
-            initial={{ scale: 0, opacity: 0.35 }}
-            animate={{ scale: 1.5, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            onAnimationComplete={() => removeRipple(ripple.id)}
-          />
-        ))}
+        <AnimatePresence>
+          {rippleEffect.map(ripple => (
+            <motion.span
+              key={ripple.id}
+              className="absolute bg-white/30 rounded-full"
+              style={{
+                left: ripple.x,
+                top: ripple.y,
+                width: ripple.size,
+                height: ripple.size,
+              }}
+              initial={{ scale: 0, opacity: 0.35 }}
+              animate={{ scale: 1.5, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              onAnimationComplete={() => removeRipple(ripple.id)}
+            />
+          ))}
+        </AnimatePresence>
 
         {/* Button content */}
         <motion.div
@@ -226,7 +207,7 @@ const Button = ({
         <AnimatePresence>
           {isLoading && (
             <motion.div
-              className="absolute inset-0 flex items-center justify-center bg-inherit"
+              className="absolute inset-0 flex items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -241,7 +222,7 @@ const Button = ({
         </AnimatePresence>
       </motion.button>
 
-      {/* Enhanced error message with better animation */}
+      {/* Error message */}
       <AnimatePresence>
         {error && (
           <motion.div
@@ -270,20 +251,10 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   leftIcon: PropTypes.element,
   rightIcon: PropTypes.element,
-  animation: PropTypes.oneOf(['bounce', 'slide', 'pulse', 'glow', 'float', 'shine']),
+  animation: PropTypes.oneOf(['bounce', 'slide', 'pulse', 'glow', 'float']),
   ripple: PropTypes.bool,
   error: PropTypes.string,
   onClick: PropTypes.func,
-};
-
-Button.defaultProps = {
-  variant: 'primary',
-  size: 'md',
-  className: '',
-  isLoading: false,
-  disabled: false,
-  animation: 'bounce',
-  ripple: true,
 };
 
 export default Button;
