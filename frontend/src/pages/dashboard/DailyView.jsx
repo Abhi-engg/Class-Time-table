@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import TimeTable from '../../components/ui/TimeTable';
 import { motion } from 'framer-motion';
+import { useTimetable } from '../../hooks/useTimetable';
 
 const DailyView = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [nextClass, setNextClass] = useState(null);
+
+  const { timetable, loading, error } = useTimetable('daily');
 
   useEffect(() => {
     const handleResize = () => {
@@ -89,6 +92,28 @@ const DailyView = () => {
 
     return scheduleData[days[dayOfWeek]] || [];
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }}
+        className="text-center py-8"
+      >
+        <p className="text-red-500 dark:text-red-400">
+          Error loading timetable: {error}
+        </p>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white/30 via-blue-50/20 to-indigo-50/30 
@@ -191,7 +216,7 @@ const DailyView = () => {
           <TimeTable 
             isMobileView={isMobileView} 
             currentDate={currentDate}
-            classes={getTodayClasses()}
+            classes={timetable}
             getClassTypeColor={(type) => {
               switch (type) {
                 case 'Lecture':
